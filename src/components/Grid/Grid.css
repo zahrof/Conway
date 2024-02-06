@@ -1,0 +1,14 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(50, 20px); /* 50 columns */
+  }
+  
+  .cell {
+    height: 20px;
+    border: 1px solid #ccc;
+  }
+  
+  .cell.alive {
+    background-color: #333;
+  }
+  
