@@ -5,10 +5,11 @@
   
   .cell {
     height: 20px;
-    border: 1px solid #ccc;
+    border: 1px solid #612121;
+    border-radius: 50px;
   }
   
   .cell.alive {
-    background-color: #333;
+    background-color: #3d0a49;
   }
   
