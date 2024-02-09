@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle, useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./Grid.css";
 
 interface CellProps {
@@ -7,37 +7,24 @@ interface CellProps {
 }
 
 const Cell: React.FC<CellProps> = ({ alive, onClick }) => {
-  return (
-    <div
-      className={`cell ${alive ? "alive" : ""}`}
-      onClick={onClick}
-    />
-  );
+  return <div className={`cell ${alive ? "alive" : ""}`} onClick={onClick} />;
 };
 
 interface GridProps {
   rows: number;
   cols: number;
-  flag: boolean;
 }
 
-const Grid: React.FC<GridProps> = ({ rows, cols, flag }) => {
-  const [grid, setGrid] = useState<boolean[][]>(() => {
-    const rowArray = Array.from({ length: rows }, () =>
+const Grid: React.FC<GridProps> = ({ rows, cols }) => {
+  const [grid, setGrid] = useState<boolean[][]>(() =>
+    Array.from({ length: rows }, () =>
       Array.from({ length: cols }, () => false)
-    );
-    return rowArray;
-  });
+    )
+  );
 
+  const [isRunning, setIsRunning] = useState(false);
 
-  useEffect(() => {
-    console.log('flag: ', flag);
-        if (flag) {
-            toggleGrid();
-        } else {
-
-        }
-  }, [flag]);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null); // Use NodeJS.Timeout for Node environments or number for browser environments
 
   const toggleCell = (rowIndex: number, colIndex: number) => {
     const newGrid = [...grid];
@@ -45,35 +32,107 @@ const Grid: React.FC<GridProps> = ({ rows, cols, flag }) => {
     setGrid(newGrid);
   };
 
-  const toggleGrid = (() => {
-    for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-            console.log('is the flag set to true?: ', flag);
-            if (flag) {
-                console.log('i am here');
-                setTimeout(() => {
-                    toggleCell(j, i);
-                }, (i * rows + j) * 1000); // Adjusted delay
-            }
-        }
+  const evaluateGrid = useCallback(() => {
+    const dir = [
+      [-1, -1],
+      [-1, 0],
+      [-1, 1],
+      [0, -1],
+      [0, 1],
+      [1, -1],
+      [1, 0],
+      [1, 1],
+    ];
+    // Make a copy of the grid to work on
+    let newGrid = JSON.parse(JSON.stringify(grid)); // Deep copy
+
+    // Example loop structure to evaluate each cell
+    const updatedCells = [];
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        let numNeighbors = 0;
+
+        dir.forEach(([dx, dy]) => {
+          const newX = row + dx;
+          const newY = col + dy;
+
+          if (
+            newX >= 0 &&
+            newX < rows &&
+            newY >= 0 &&
+            newY < cols &&
+            newGrid[newX][newY] === true
+          )
+            numNeighbors++;
+        });
+
+        // if cell is dead but has 3 neighbors, save it
+        if (newGrid[row][col] === false && numNeighbors === 3)
+          updatedCells.push([row, col]);
+        else if (
+          newGrid[row][col] === true &&
+          (numNeighbors < 2 || numNeighbors > 3)
+        )
+          updatedCells.push([row, col]);
+      }
     }
-  });
+
+    updatedCells.forEach(([row, col]) => {
+      newGrid[row][col] = !newGrid[row][col];
+    });
+
+    // Update the grid state with the new grid
+    return newGrid;
+  }, [cols, grid, rows]);
+
+  useEffect(() => {
+    if (isRunning) {
+      intervalRef.current = setInterval(() => {
+        console.log("Evaluating grid...");
+
+        const newGrid = evaluateGrid();
+        setGrid(newGrid);
+      }, 350);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+
+    // Cleanup on component unmount or when isRunning changes
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isRunning, evaluateGrid]); // Dependency array includes isRunning to react to its changes
+
+  const clearGrid = () => {
+    const newGrid = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => false)
+    );
+
+    setGrid(newGrid);
+  };
 
   return (
     <>
-    <div className="grid">
-      {grid.map((row, rowIndex) => (
-        <div key={rowIndex} className="row">
-          {row.map((cell, colIndex) => (
-            <Cell
-              key={`${rowIndex}-${colIndex}`}
-              alive={cell}
-              onClick={() => toggleCell(rowIndex, colIndex)}
-            />
-          ))}
-        </div>
-      ))}
-    </div>
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: `repeat(${cols}, 20px)` }}
+      >
+        {grid.map((row, rowIndex) => (
+          <div key={rowIndex} className="row">
+            {row.map((cell, colIndex) => (
+              <Cell
+                key={`${rowIndex}-${colIndex}`}
+                alive={cell}
+                onClick={() => toggleCell(rowIndex, colIndex)}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <button onClick={() => setIsRunning(!isRunning)}>
+        {isRunning ? "Stop" : "Start"}
+      </button>
+      <button onClick={clearGrid}>Clear</button>
     </>
   );
 };
