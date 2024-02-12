@@ -129,10 +129,14 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
           </div>
         ))}
       </div>
+      <button onClick={clearGrid}>Reset</button>
       <button onClick={() => setIsRunning(!isRunning)}>
-        {isRunning ? "Stop" : "Start"}
-      </button>
-      <button onClick={clearGrid}>Clear</button>
+              {isRunning ? "Stop" : "Start"}
+            </button>
+      <button onClick={() => {
+        const newGrid = evaluateGrid();
+        setGrid(newGrid);}}>
+        Next</button>
     </>
   );
 };
