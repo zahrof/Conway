@@ -1,12 +1,11 @@
 .grid {
     display: grid;
-    grid-template-columns: repeat(50, 20px); /* 50 columns */
   }
   
   .cell {
     height: 20px;
     border: 1px solid #612121;
-    border-radius: 50px;
+    border-radius: 0px;
   }
   
   .cell.alive {
