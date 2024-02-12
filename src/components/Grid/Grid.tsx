@@ -127,7 +127,7 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
     </div>
       <div
         className="grid"
-        style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+        style={{ gridTemplateColumns: `repeat(auto-fill, minmax(20px, 1fr))` }}
       >
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="row">
