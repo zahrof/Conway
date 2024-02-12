@@ -113,9 +113,21 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
 
   return (
     <>
+    <div className="header">
+        <h1> Conway's game of life </h1>
+            <div className="buttons">
+                <button onClick={clearGrid}>Reset</button>
+                <button onClick={() => setIsRunning(!isRunning)}>{isRunning ? "Stop" : "Start"}</button>
+                <button onClick={() => {
+                    const newGrid = evaluateGrid();
+                    setGrid(newGrid);
+                    }
+                }>Next</button>
+            </div>
+    </div>
       <div
         className="grid"
-        style={{ gridTemplateColumns: `repeat(${cols}, 20px)` }}
+        style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
       >
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="row">
@@ -129,14 +141,6 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
           </div>
         ))}
       </div>
-      <button onClick={clearGrid}>Reset</button>
-      <button onClick={() => setIsRunning(!isRunning)}>
-              {isRunning ? "Stop" : "Start"}
-            </button>
-      <button onClick={() => {
-        const newGrid = evaluateGrid();
-        setGrid(newGrid);}}>
-        Next</button>
     </>
   );
 };

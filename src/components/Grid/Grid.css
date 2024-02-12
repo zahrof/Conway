@@ -1,14 +1,34 @@
 .grid {
-    display: grid;
-  }
+      width: 100%;
+      height: 75vh;
+      display: grid;
+      margin: 0 auto;
+      max-width: 500px;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+}
   
-  .cell {
+.cell {
     height: 20px;
-    border: 1px solid #612121;
+    border: 1px solid #FFCF96;
     border-radius: 0px;
-  }
-  
-  .cell.alive {
-    background-color: #3d0a49;
-  }
-  
+    background-color: #F6FDC3;
+}
+
+.cell.alive {
+    background-color: #FF8080;
+}
+
+button {
+    margin: 10px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 13px;
+    height: 54px;
+}

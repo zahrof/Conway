@@ -1,10 +1,12 @@
 import Grid from "../Grid/Grid";
+import "./Panel.css";
 
 const Panel = () => {
   return (
     <>
-      <div> <h1> Conway's game of life </h1> </div>
-      <Grid rows={25} cols={25} />
+      <div>
+          <Grid rows={25} cols={25} />
+      </div>
     </>
   );
 };
